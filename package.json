@@ -39,8 +39,10 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@supabase/supabase-js": "^2.21.0",
 		"@tiptap/core": "^2.0.3",
 		"@tiptap/pm": "^2.0.3",
-		"@tiptap/starter-kit": "^2.0.3"
+		"@tiptap/starter-kit": "^2.0.3",
+		"dotenv": "^16.0.3"
 	}
 }
