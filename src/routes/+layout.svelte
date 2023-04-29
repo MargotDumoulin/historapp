@@ -4,9 +4,27 @@
 	import '../app.postcss';
 	import { AppShell, AppBar } from '@skeletonlabs/skeleton';
 	import { page } from '$app/stores';
-	// import * as dotenv from 'dotenv';
+	import { invalidate } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import type { LayoutData } from './$types';
 
-	// dotenv.config();
+	export let data: LayoutData;
+
+	$: ({ supabase, session } = data);
+
+	onMount(() => {
+		const {
+			data: { subscription }
+		} = supabase.auth.onAuthStateChange((event, _session) => {
+			console.log('on est laaaaaaaa');
+			console.log({ sessionFromIci: session });
+			if (_session?.expires_at !== session?.expires_at) {
+				invalidate('supabase:auth');
+			}
+		});
+
+		return () => subscription.unsubscribe();
+	});
 </script>
 
 {#if $page.url.pathname === '/login' || $page.url.pathname === '/signup'}
