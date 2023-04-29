@@ -1,14 +1,18 @@
 <script lang="ts">
-	import { supabase } from '../../store/index';
+	import type { LayoutData } from '../$types';
+
+	export let data: LayoutData;
 
 	let email: string = '';
 	let password: string = '';
+
+	$: ({ supabase } = data);
 
 	const signup = async () => {
 		console.log({ email, password });
 		if (!email || !password) return;
 
-		const { data, error } = await $supabase.auth.signUp({
+		const { data, error } = await supabase.auth.signUp({
 			email,
 			password
 		});
