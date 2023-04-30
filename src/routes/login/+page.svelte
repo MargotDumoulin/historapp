@@ -17,8 +17,6 @@
 			password
 		});
 
-		console.log({ data });
-
 		if (!error) {
 			goto('/');
 		}

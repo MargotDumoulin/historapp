@@ -18,8 +18,6 @@ export const load: LayoutLoad = async ({ fetch, data, depends, url }) => {
 		data: { session }
 	} = await supabase.auth.getSession();
 
-	console.log({ session });
-
 	if (!session && url.pathname !== '/login' && url.pathname !== '/signup') {
 		throw redirect(303, '/login');
 	}

@@ -9,15 +9,12 @@
 	$: ({ supabase } = data);
 
 	const signup = async () => {
-		console.log({ email, password });
 		if (!email || !password) return;
 
 		const { data, error } = await supabase.auth.signUp({
 			email,
 			password
 		});
-
-		console.log({ data, error });
 	};
 </script>
 
