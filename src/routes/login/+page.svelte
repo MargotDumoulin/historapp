@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import FormInput from '$lib/components/FormInput.svelte';
+	import type { FieldType } from '$lib/types/general.types';
 	import type { LayoutData } from '../$types';
-	import type { FieldType } from '../../utils/FormValidator';
 
 	export let data: LayoutData;
+	$: ({ supabase } = data);
+
 	let wrongCredentialsError = '';
 
 	const fields: FieldType = {
@@ -11,12 +14,7 @@
 		password: ''
 	};
 
-	const fieldsErrors: FieldType = {
-		email: '',
-		password: ''
-	};
-
-	$: ({ supabase } = data);
+	const fieldsErrors: FieldType = {};
 
 	const validateFields = () => {
 		Object.keys(fields).forEach((fieldKey) => {
@@ -29,7 +27,7 @@
 		if (Object.values(fieldsErrors).filter(Boolean).length > 0) return;
 
 		const { email, password } = fields;
-		const { data, error } = await supabase.auth.signInWithPassword({
+		const { error } = await supabase.auth.signInWithPassword({
 			email,
 			password
 		});
@@ -43,24 +41,14 @@
 	<div class="login-card-container card">
 		<form>
 			<div class="mb-4">
-				<label class="block text-gray-700 text-sm font-bold mb-2" for="username"> Username </label>
-				<input
-					class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-					id="email"
-					type="text"
-					bind:value={fields.email}
-				/>
-				{#if fieldsErrors.email}<div class="text-red-500">{fieldsErrors.email}</div>{/if}
+				<FormInput bind:field={fields.email} fieldName="Email" fieldError={fieldsErrors.email} />
 			</div>
 			<div class="mb-3">
-				<label class="block text-gray-700 text-sm font-bold mb-2" for="password"> Password </label>
-				<input
-					class="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-					id="password"
-					type="password"
-					bind:value={fields.password}
+				<FormInput
+					bind:field={fields.password}
+					fieldName="Password"
+					fieldError={fieldsErrors.password}
 				/>
-				{#if fieldsErrors.password}<div class="text-red-500">{fieldsErrors.password}</div>{/if}
 			</div>
 			{#if wrongCredentialsError}
 				<div class="text-red-500">{wrongCredentialsError}</div>
