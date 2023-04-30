@@ -1,15 +1,28 @@
 <script lang="ts">
+	import FormInput from '$lib/components/FormInput.svelte';
+	import { validateFields } from '$lib/utils/validate';
 	import type { LayoutData } from '../$types';
+	import type { FieldType } from '$lib/types/general.types';
 
 	export let data: LayoutData;
 
-	let email: string = '';
-	let password: string = '';
+	const fields: FieldType = {
+		email: '',
+		password: '',
+		firstname: '',
+		lastname: '',
+		confirmPassword: ''
+	};
+
+	let fieldsErrors: FieldType = {};
 
 	$: ({ supabase } = data);
 
 	const signup = async () => {
-		if (!email || !password) return;
+		fieldsErrors = validateFields(fields, fieldsErrors);
+		if (Object.values(fieldsErrors).filter(Boolean).length > 0) return;
+
+		const { email, password } = fields;
 
 		const { data, error } = await supabase.auth.signUp({
 			email,
@@ -23,79 +36,52 @@
 		<form on:submit|preventDefault={signup} class="w-full max-w-lg">
 			<div class="flex flex-wrap -mx-3 mb-3">
 				<div class="w-1/2 px-3 mb-3">
-					<label
-						class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-						for="grid-first-name"
-					>
-						First Name
-					</label>
-					<input
-						class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
-						id="grid-first-name"
+					<FormInput
+						bind:field={fields.firstname}
+						fieldName="First name"
+						fieldError={fieldsErrors.firstname}
 						type="text"
-						placeholder="Jane"
+						id="firstname"
 					/>
 				</div>
 				<div class="w-1/2 md:w-1/2 px-3">
-					<label
-						class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-						for="grid-last-name"
-					>
-						Last Name
-					</label>
-					<input
-						class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-						id="grid-last-name"
+					<FormInput
+						bind:field={fields.lastname}
+						fieldName="Last name"
+						fieldError={fieldsErrors.lastname}
 						type="text"
-						placeholder="Doe"
+						id="lastname"
 					/>
 				</div>
 			</div>
 			<div class="flex flex-wrap -mx-3 mb-3">
 				<div class="w-full px-3">
-					<label
-						class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-						for="email"
-					>
-						Email
-					</label>
-					<input
-						class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+					<FormInput
+						bind:field={fields.email}
+						fieldName="Email"
+						fieldError={fieldsErrors.email}
+						type="text"
 						id="email"
-						type="email"
-						placeholder="jane.doe@gmail.com"
-						bind:value={email}
 					/>
 				</div>
 			</div>
 			<div class="flex flex-wrap -mx-3 mb-3">
 				<div class="w-1/2 px-3">
-					<label
-						class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-						for="grid-password"
-					>
-						Password
-					</label>
-					<input
-						class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-						id="grid-password"
+					<FormInput
+						bind:field={fields.password}
+						fieldName="Password"
+						fieldError={fieldsErrors.password}
 						type="password"
-						placeholder="******************"
-						bind:value={password}
+						id="password"
 					/>
 				</div>
 				<div class="w-1/2 px-3">
-					<label
-						class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-						for="confirm-grid-password"
-					>
-						Confirm password
-					</label>
-					<input
-						class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-						id="confirm-grid-password"
+					<FormInput
+						bind:field={fields.confirmPassword}
+						fieldName="Confirm password"
+						fieldError={fieldsErrors.confirmPassword}
 						type="password"
-						placeholder="******************"
+						id="confirm-password"
 					/>
 				</div>
 			</div>

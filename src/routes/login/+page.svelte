@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import FormInput from '$lib/components/FormInput.svelte';
 	import type { FieldType } from '$lib/types/general.types';
+	import { validateFields } from '$lib/utils/validate';
 	import type { LayoutData } from '../$types';
 
 	export let data: LayoutData;
@@ -14,16 +15,10 @@
 		password: ''
 	};
 
-	const fieldsErrors: FieldType = {};
-
-	const validateFields = () => {
-		Object.keys(fields).forEach((fieldKey) => {
-			fieldsErrors[fieldKey] = !fields[fieldKey] ? `Missing ${fieldKey} field` : '';
-		});
-	};
+	let fieldsErrors: FieldType = {};
 
 	const login = async () => {
-		validateFields();
+		fieldsErrors = validateFields(fields, fieldsErrors);
 		if (Object.values(fieldsErrors).filter(Boolean).length > 0) return;
 
 		const { email, password } = fields;
