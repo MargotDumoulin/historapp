@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import FormInput from '$lib/components/FormInput.svelte';
-	import type { FieldType } from '$lib/types/general.types';
+	import type { FieldRules, FieldType } from '$lib/types/general.types';
 	import { validateFields } from '$lib/utils/validate';
 	import type { LayoutData } from '../$types';
 
@@ -17,8 +17,15 @@
 
 	let fieldsErrors: FieldType = {};
 
+	const rules: FieldRules = {
+		email: {
+			regex: "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$",
+			errorMessage: 'Email must be formatted correctly'
+		}
+	};
+
 	const login = async () => {
-		fieldsErrors = validateFields(fields, fieldsErrors);
+		fieldsErrors = validateFields(fields, fieldsErrors, rules);
 		if (Object.values(fieldsErrors).filter(Boolean).length > 0) return;
 
 		const { email, password } = fields;
