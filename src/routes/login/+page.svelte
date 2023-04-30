@@ -41,13 +41,21 @@
 	<div class="login-card-container card">
 		<form>
 			<div class="mb-4">
-				<FormInput bind:field={fields.email} fieldName="Email" fieldError={fieldsErrors.email} />
+				<FormInput
+					bind:field={fields.email}
+					fieldName="Email"
+					fieldError={fieldsErrors.email}
+					type="text"
+					id="email"
+				/>
 			</div>
 			<div class="mb-3">
 				<FormInput
 					bind:field={fields.password}
 					fieldName="Password"
 					fieldError={fieldsErrors.password}
+					type="password"
+					id="password"
 				/>
 			</div>
 			{#if wrongCredentialsError}
