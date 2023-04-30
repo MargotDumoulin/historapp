@@ -2,7 +2,7 @@
 	import FormInput from '$lib/components/FormInput.svelte';
 	import { validateFields } from '$lib/utils/validate';
 	import type { LayoutData } from '../$types';
-	import type { FieldType } from '$lib/types/general.types';
+	import type { FieldRules, FieldType } from '$lib/types/general.types';
 
 	export let data: LayoutData;
 
@@ -14,15 +14,28 @@
 		confirmPassword: ''
 	};
 
+	const rules: FieldRules = {
+		password: {
+			regex: '.{6,}',
+			errorMessage: 'Password must be at least 6 char'
+		},
+		email: {
+			regex: "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:.[a-zA-Z0-9-]+)*$",
+			errorMessage: 'Email must be formatted correctly'
+		}
+	};
+
 	let fieldsErrors: FieldType = {};
 
 	$: ({ supabase } = data);
 
 	const signup = async () => {
-		fieldsErrors = validateFields(fields, fieldsErrors);
-		if (Object.values(fieldsErrors).filter(Boolean).length > 0) return;
+		fieldsErrors = validateFields(fields, fieldsErrors, rules);
+		const { email, password, confirmPassword, firstname, lastname } = fields;
 
-		const { email, password } = fields;
+		if (password !== confirmPassword) fieldsErrors.confirmPassword = 'Passwords must match';
+
+		if (Object.values(fieldsErrors).filter(Boolean).length > 0) return;
 
 		const { data, error } = await supabase.auth.signUp({
 			email,
