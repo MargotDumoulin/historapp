@@ -20,7 +20,7 @@
 
 <div class="login-container h-full w-full flex items-center justify-center mx-auto">
 	<div class="login-card-container card">
-		<form class="w-full max-w-lg">
+		<form on:submit|preventDefault={signup} class="w-full max-w-lg">
 			<div class="flex flex-wrap -mx-3 mb-3">
 				<div class="w-1/2 px-3 mb-3">
 					<label

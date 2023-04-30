@@ -1,7 +1,7 @@
 import { PUBLIC_SUPABASE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit';
 import type { LayoutLoad } from './$types';
-import type { Database } from '../lib/database.types';
+import type { Database } from '../lib/types/database.types';
 import { redirect } from '@sveltejs/kit';
 
 export const load: LayoutLoad = async ({ fetch, data, depends, url }) => {
