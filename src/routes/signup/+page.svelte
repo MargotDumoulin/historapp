@@ -5,6 +5,7 @@
 	import type { FieldType } from '$lib/types/general.types';
 	import { rules } from '$lib/utils/rules';
 	import { goto } from '$app/navigation';
+	import { userLoggedIn } from '../../store';
 
 	export let data: LayoutData;
 
@@ -28,16 +29,16 @@
 
 		if (Object.values(fieldsErrors).filter(Boolean).length > 0) return;
 
-		// TODO: put this operations in actions !!
+		// TODO: put these operations in actions !! + HANDLE ERRORS OH MY GOD FFS
 		const { data, error } = await supabase.auth.signUp({
 			email,
 			password
 		});
 
-		if (!error) {
+		if (!error && data.user) {
 			await supabase
 				.from('users')
-				.insert({ uuid_auth_user: data.user?.id, last_name: lastname, first_name: firstname });
+				.insert({ uuid_auth_user: data.user.id, last_name: lastname, first_name: firstname });
 
 			goto('/login');
 		}

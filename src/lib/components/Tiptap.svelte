@@ -3,13 +3,15 @@
 	import { Editor } from '@tiptap/core';
 	import StarterKit from '@tiptap/starter-kit';
 	import Collaboration from '@tiptap/extension-collaboration';
+	import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
 	import { HocuspocusProvider } from '@hocuspocus/provider';
+	import { userLoggedIn } from '../../store';
 
 	let element: any;
 	let editor: any;
 
 	onMount(() => {
-		// Set up the Hocuspocus WebSocket provider
+		const randomColor = Math.floor(Math.random() * 16777215).toString(16);
 		const provider = new HocuspocusProvider({
 			url: 'ws://0.0.0.0:1234',
 			name: 'example-document'
@@ -19,12 +21,17 @@
 			element,
 			extensions: [
 				StarterKit.configure({
-					// The Collaboration extension comes with its own history handling
 					history: false
 				}),
-				// Register the document with Tiptap
 				Collaboration.configure({
 					document: provider.document
+				}),
+				CollaborationCursor.configure({
+					provider: provider,
+					user: {
+						name: `${$userLoggedIn?.first_name} ${$userLoggedIn?.last_name}`,
+						color: `#${randomColor}`
+					}
 				})
 			],
 			onTransaction: () => {

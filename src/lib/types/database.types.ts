@@ -34,7 +34,26 @@ export interface Database {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      users: {
+        Row: {
+          first_name: string | null
+          id: string
+          last_name: string | null
+          uuid_auth_user: string
+        }
+        Insert: {
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          uuid_auth_user: string
+        }
+        Update: {
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          uuid_auth_user?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
