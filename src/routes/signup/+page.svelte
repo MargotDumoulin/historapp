@@ -4,6 +4,7 @@
 	import type { LayoutData } from '../$types';
 	import type { FieldType } from '$lib/types/general.types';
 	import { rules } from '$lib/utils/rules';
+	import { goto } from '$app/navigation';
 
 	export let data: LayoutData;
 
@@ -27,16 +28,25 @@
 
 		if (Object.values(fieldsErrors).filter(Boolean).length > 0) return;
 
-		await supabase.auth.signUp({
+		// TODO: put this operations in actions !!
+		const { data, error } = await supabase.auth.signUp({
 			email,
 			password
 		});
+
+		if (!error) {
+			await supabase
+				.from('users')
+				.insert({ uuid_auth_user: data.user?.id, last_name: lastname, first_name: firstname });
+
+			goto('/login');
+		}
 	};
 </script>
 
 <div class="login-container h-full w-full flex items-center justify-center mx-auto">
 	<div class="login-card-container card">
-		<form on:submit|preventDefault={signup} class="w-full max-w-lg">
+		<form class="w-full max-w-lg">
 			<div class="flex flex-wrap -mx-3">
 				<div class="w-1/2 px-3 mb-3">
 					<FormInput
@@ -91,7 +101,7 @@
 			<div class="flex items-center">
 				<button
 					class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-					type="button"
+					type="submit"
 					on:click={signup}
 				>
 					Create
