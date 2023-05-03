@@ -49,7 +49,7 @@
 	</button>
 {/if}
 
-<div bind:this={element} />
+<div class="mt-5" bind:this={element} />
 
 <style lang="postcss">
 	button.active {
