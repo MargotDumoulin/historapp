@@ -25,14 +25,14 @@
 				}),
 				Collaboration.configure({
 					document: provider.document
-				}),
-				CollaborationCursor.configure({
-					provider: provider,
-					user: {
-						name: `${$userLoggedIn?.first_name} ${$userLoggedIn?.last_name}`,
-						color: `#${randomColor}`
-					}
 				})
+				// CollaborationCursor.configure({
+				// 	provider: provider,
+				// 	user: {
+				// 		name: `${$userLoggedIn?.first_name} ${$userLoggedIn?.last_name}`,
+				// 		color: `#${randomColor}`
+				// 	}
+				// })
 			],
 			onTransaction: () => {
 				// force re-render so `editor.isActive` works as expected
