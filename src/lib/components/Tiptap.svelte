@@ -4,17 +4,26 @@
 	import StarterKit from '@tiptap/starter-kit';
 	import Collaboration from '@tiptap/extension-collaboration';
 	import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
-	import { HocuspocusProvider } from '@hocuspocus/provider';
 	import { userLoggedIn } from '../../store';
+	import * as Y from 'yjs';
+	import SupabaseProvider from '$lib/utils/SupabaseProvider';
+	import type { LayoutData } from '../../routes/$types';
+
+	export let data: LayoutData;
+	$: ({ supabase } = data);
 
 	let element: any;
 	let editor: any;
 
 	onMount(() => {
 		const randomColor = Math.floor(Math.random() * 16777215).toString(16);
-		const provider = new HocuspocusProvider({
-			url: 'ws://0.0.0.0:1234',
-			name: 'example-document'
+
+		const yDoc = new Y.Doc();
+		const provider = new SupabaseProvider(yDoc, supabase, {
+			channel: 1 as unknown as string,
+			id: 1,
+			tableName: 'documents',
+			columnName: 'document'
 		});
 
 		editor = new Editor({
@@ -24,7 +33,7 @@
 					history: false
 				}),
 				Collaboration.configure({
-					document: provider.document
+					document: provider.doc
 				})
 				// CollaborationCursor.configure({
 				// 	provider: provider,
