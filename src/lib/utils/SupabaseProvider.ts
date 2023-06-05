@@ -50,18 +50,11 @@ export default class SupabaseProvider extends EventEmitter {
 	}
 
 	removeSelfFromAwarenessOnUnload(doc: Y.Doc) {
-		console.log('aled quand est-ce que on passe ici');
-		console.log({ bam: doc });
 		awarenessProtocol.removeAwarenessStates(this.awareness, [doc.clientID], 'window unload');
 	}
 
 	async save() {
-		console.log('on save ici');
-		console.log({ docBeforeSaveRaw: this.doc.getMap() });
-		console.log({ docBeforeSave: this.doc.getMap().toJSON() });
 		const content = Array.from(Y.encodeStateAsUpdateV2(this.doc));
-		console.log({ content });
-		console.log({ contentParsed: content });
 
 		const { error } = await this.supabase
 			.from(this.config.tableName)
@@ -69,7 +62,6 @@ export default class SupabaseProvider extends EventEmitter {
 			.eq(this.config.idName || 'id', this.config.id);
 
 		if (error) {
-			console.log({ error });
 			throw error;
 		}
 
@@ -87,11 +79,9 @@ export default class SupabaseProvider extends EventEmitter {
 
 		this.logger('Retrieved data from supabase', status);
 
-		console.log({ data });
 		if (data && data[this.config.columnName]) {
 			this.logger('Applying update to yjs');
 			try {
-				console.log('ON ARRIVE DANS LE ON CONNECT AVEC LA DATA ');
 				this.applyUpdate(Uint8Array.from(data[this.config.columnName]));
 			} catch (error) {
 				this.logger(error);
@@ -113,18 +103,7 @@ export default class SupabaseProvider extends EventEmitter {
 
 	private applyUpdate(update: Uint8Array, origin?: any) {
 		this.version++;
-		console.log('ON APPLY LA UPDATE');
-		console.log({ update });
-		console.log(new TextDecoder().decode(update));
-		console.log({ docBeforeUpdate: this.doc.getMap(), billy: typeof this.doc.getMap() });
-
-		try {
-			Y.applyUpdateV2(this.doc, update, origin);
-		} catch (error) {
-			console.log({ error });
-		}
-
-		console.log({ docAfterUpdate: this.doc.getMap().toJSON() });
+		Y.applyUpdateV2(this.doc, update, origin);
 	}
 
 	private disconnect() {
@@ -139,7 +118,6 @@ export default class SupabaseProvider extends EventEmitter {
 		if (this.channel) {
 			this.channel
 				.on(REALTIME_LISTEN_TYPES.BROADCAST, { event: 'message' }, ({ payload }) => {
-					console.log('Un message a été reçu !');
 					this.onMessage(Uint8Array.from(payload));
 				})
 				.on(REALTIME_LISTEN_TYPES.BROADCAST, { event: 'awareness' }, ({ payload }) => {
@@ -172,8 +150,6 @@ export default class SupabaseProvider extends EventEmitter {
 		private config: SupabaseProviderConfig
 	) {
 		super();
-
-		console.log({ doc });
 
 		this.awareness = this.config.awareness || new awarenessProtocol.Awareness(doc);
 
@@ -278,11 +254,9 @@ export default class SupabaseProvider extends EventEmitter {
 
 	public onMessage(message: Uint8Array) {
 		// if (!this.isOnline()) return;
-		console.log('on est online');
 		try {
 			this.applyUpdate(message, this);
 		} catch (err) {
-			console.log({ err });
 			this.logger(err);
 		}
 	}

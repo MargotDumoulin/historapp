@@ -34,14 +34,10 @@
 				data: { user }
 			} = await supabase.auth.getUser();
 
-			console.log({ user });
-
 			const { data: userComplete, error: userError } = await supabase
 				.from('users')
 				.select()
 				.eq('uuid_auth_user', user?.id);
-
-			console.log({ userComplete });
 
 			if (userComplete?.[0] && !userError) {
 				// TODO: QUAND LE USER ARRIVE SUR L'APP ET EST DEJA AUTHENTIFIE, METTRE LE USER DANS LE STORE !!!
