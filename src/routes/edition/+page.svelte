@@ -1,5 +1,8 @@
-<script>
+<script lang="ts">
 	import Tiptap from '$lib/components/Tiptap.svelte';
+	import type { LayoutData } from '../$types';
+
+	export let data: LayoutData;
 </script>
 
 <div class="p-20 flex items-center justify-content mx-auto flex-col">
@@ -26,7 +29,7 @@
 				<span>Save</span>
 			</button>
 		</div>
-		<div class="sheet-container p-5 card"><Tiptap /></div>
+		<div class="sheet-container p-5 card"><Tiptap {data} /></div>
 	</div>
 </div>
 
