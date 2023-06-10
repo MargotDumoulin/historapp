@@ -1,6 +1,15 @@
 <script lang="ts">
 	import Tiptap from '$lib/components/Tiptap.svelte';
-	import type { LayoutData } from '../$types';
+	import type { LayoutData } from '../../$types';
+	import { page } from '$app/stores';
+	import { ProgressBar } from '@skeletonlabs/skeleton';
+
+	// TODO: Type !!
+	let documentId: any;
+
+	page.subscribe(({ params }) => {
+		documentId = params.id;
+	});
 
 	export let data: LayoutData;
 </script>
@@ -29,7 +38,13 @@
 				<span>Save</span>
 			</button>
 		</div>
-		<div class="sheet-container p-5 card shadow-md"><Tiptap {data} /></div>
+		<div class="sheet-container p-5 card shadow-md">
+			{#if documentId}
+				<Tiptap {data} {documentId} />
+			{:else}
+				<ProgressBar />
+			{/if}
+		</div>
 	</div>
 </div>
 

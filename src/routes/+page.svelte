@@ -20,7 +20,7 @@
 		</h1>
 	</div>
 	<div>
-		<a href="/edition" class="btn btn-sm variant-soft-primary mt-5">Commencer maintenant</a>
+		<a href="/documents" class="btn btn-sm variant-soft-primary mt-5">Commencer maintenant</a>
 	</div>
 </div>
 

@@ -10,6 +10,8 @@
 	import type { LayoutData } from '../../routes/$types';
 
 	export let data: LayoutData;
+	export let documentId: number;
+
 	$: ({ supabase } = data);
 
 	let element: any;
@@ -21,7 +23,7 @@
 		const yDoc = new Y.Doc();
 		const provider = new SupabaseProvider(yDoc, supabase, {
 			channel: 1 as unknown as string,
-			id: 1,
+			id: documentId,
 			tableName: 'documents',
 			columnName: 'document'
 		});

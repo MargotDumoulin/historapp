@@ -8,9 +8,10 @@
 	} from '@skeletonlabs/skeleton';
 	import type { LayoutData } from '../$types';
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 
 	export let data: LayoutData;
-	$: ({ supabase } = data);
+	$: ({ supabase, session } = data);
 
 	// TODO: type !!
 	let sourceData: any;
@@ -20,6 +21,18 @@
 		if (!error) {
 			sourceData = data;
 		}
+	};
+
+	const goToEdit = (id: number) => {
+		goto(`/edition/${id}`);
+	};
+
+	const createDocument = async () => {
+		const {
+			data: { id },
+			error
+		} = await supabase.from('documents').insert({ id_owner: session?.user.id }).select();
+		goto(`/edition/${id}`);
 	};
 
 	let loading = true;
@@ -36,6 +49,7 @@
 			<h4 class="ml-2 mb-1">Documents</h4>
 			<button
 				class="m-2 btn-sm variant-soft font-bold py-2 px-4 rounded-full inline-flex items-center"
+				on:click={createDocument}
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -57,6 +71,7 @@
 										<div>{document.name}</div>
 										<button
 											class="m-2 btn-sm variant-soft bg-tertiary-50 text-tertiary-500 font-bold py-2 px-4 rounded-full inline-flex items-center"
+											on:click={() => goToEdit(document.id)}
 										>
 											<svg
 												xmlns="http://www.w3.org/2000/svg"
