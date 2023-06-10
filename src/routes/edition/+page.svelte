@@ -29,7 +29,7 @@
 				<span>Save</span>
 			</button>
 		</div>
-		<div class="sheet-container p-5 card"><Tiptap {data} /></div>
+		<div class="sheet-container p-5 card shadow-md"><Tiptap {data} /></div>
 	</div>
 </div>
 
