@@ -1,15 +1,33 @@
 <script lang="ts">
 	import Tiptap from '$lib/components/Tiptap.svelte';
-	import { Table, tableMapperValues, type TableSource } from '@skeletonlabs/skeleton';
+	import {
+		ProgressRadial,
+		Table,
+		tableMapperValues,
+		type TableSource
+	} from '@skeletonlabs/skeleton';
 	import type { LayoutData } from '../$types';
+	import { onMount } from 'svelte';
 
 	export let data: LayoutData;
+	$: ({ supabase } = data);
 
-	const sourceData = [
-		{ name: 'Tiptap edit', id: 1 },
-		{ name: 'Helium', id: 2 },
-		{ name: 'Wap', id: 3 }
-	];
+	// TODO: type !!
+	let sourceData: any;
+
+	const fetchDocuments = async () => {
+		const { data, error } = await supabase.from('documents').select();
+		if (!error) {
+			sourceData = data;
+		}
+	};
+
+	let loading = true;
+
+	onMount(async () => {
+		await fetchDocuments();
+		loading = false;
+	});
 </script>
 
 <div class="p-20 flex items-center justify-content mx-auto flex-col">
@@ -29,33 +47,46 @@
 			</button>
 		</div>
 		<div class="sheet-container p-5 card shadow-md">
-			<table>
-				<tbody>
-					{#each sourceData as document, i (document.id)}
-						<tr>
-							<td>
-								<div class="row-container">
-									<div>{document.name}</div>
-									<button
-										class="m-2 btn-sm variant-soft bg-tertiary-50 text-tertiary-500 font-bold py-2 px-4 rounded-full inline-flex items-center"
-									>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											viewBox="0 0 24 24"
-											fill="currentColor"
-											class="w-3 h-3 mr-2"
-											><path
-												d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"
-											/></svg
+			{#if sourceData?.length > 0}
+				<table>
+					<tbody>
+						{#each sourceData as document, i (document.id)}
+							<tr>
+								<td>
+									<div class="row-container">
+										<div>{document.name}</div>
+										<button
+											class="m-2 btn-sm variant-soft bg-tertiary-50 text-tertiary-500 font-bold py-2 px-4 rounded-full inline-flex items-center"
 										>
-										<span>Edit</span>
-									</button>
-								</div>
-							</td>
-						</tr>
-					{/each}
-				</tbody>
-			</table>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												viewBox="0 0 24 24"
+												fill="currentColor"
+												class="w-3 h-3 mr-2"
+												><path
+													d="M7.127 22.562l-7.127 1.438 1.438-7.128 5.689 5.69zm1.414-1.414l11.228-11.225-5.69-5.692-11.227 11.227 5.689 5.69zm9.768-21.148l-2.816 2.817 5.691 5.691 2.816-2.819-5.691-5.689z"
+												/></svg
+											>
+											<span>Edit</span>
+										</button>
+									</div>
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			{:else if loading}
+				<div class="flex justify-center m-10">
+					<ProgressRadial
+						...
+						stroke={80}
+						meter="stroke-primary-500"
+						track="stroke-primary-500/30"
+					/>
+				</div>
+			{:else}
+				<div>No documents found.</div>
+			{/if}
 		</div>
 	</div>
 </div>
