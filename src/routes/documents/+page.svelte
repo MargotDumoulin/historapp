@@ -119,10 +119,6 @@
 		height: 50px;
 	}
 
-	thead {
-		border-bottom: 1px solid;
-	}
-
 	.row-container {
 		display: flex;
 		justify-content: space-between;
@@ -133,9 +129,5 @@
 
 	tr:not(:last-child) {
 		border-bottom: 1px solid #e3e3e3;
-	}
-
-	.row-container > button {
-		margin-right: 20px;
 	}
 </style>

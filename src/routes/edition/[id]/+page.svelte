@@ -4,19 +4,37 @@
 	import { page } from '$app/stores';
 	import { ProgressBar } from '@skeletonlabs/skeleton';
 
+	export let data: LayoutData;
 	// TODO: Type !!
-	let documentId: any;
+	let document: any;
+
+	const loadData = async (id: number) => {
+		const { data: dataFromDoc, error } = await data?.supabase
+			?.from('documents')
+			.select()
+			.eq('id', id)
+			.maybeSingle();
+		document = dataFromDoc;
+	};
 
 	page.subscribe(({ params }) => {
-		documentId = params.id;
+		loadData(Number(params.id));
 	});
-
-	export let data: LayoutData;
 </script>
 
 <div class="p-20 flex items-center justify-content mx-auto flex-col">
 	<div class="w-full h-full">
-		<div class="w-full flex justify-end">
+		<div class="w-full flex items-center justify-between">
+			{#if !document?.id}
+				<h4 class="ml-2 mb-1 mt-5">Document's name</h4>
+			{:else}
+				<input
+					class="bg-transparent ml-2 mt-5 focus:outline-none text-xl font-bold"
+					id={document.id}
+					type="string"
+					bind:value={document.name}
+				/>
+			{/if}
 			<button
 				class="m-2 btn-sm variant-soft hover:bg-grey text-grey-darkest font-bold py-2 px-4 rounded-full inline-flex items-center"
 			>
@@ -39,8 +57,8 @@
 			</button>
 		</div>
 		<div class="sheet-container p-5 card shadow-md">
-			{#if documentId}
-				<Tiptap {data} {documentId} />
+			{#if document?.id}
+				<Tiptap supabase={data.supabase} {document} />
 			{:else}
 				<ProgressBar />
 			{/if}

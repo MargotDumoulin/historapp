@@ -9,10 +9,8 @@
 	import SupabaseProvider from '$lib/utils/SupabaseProvider';
 	import type { LayoutData } from '../../routes/$types';
 
-	export let data: LayoutData;
-	export let documentId: number;
-
-	$: ({ supabase } = data);
+	export let supabase: LayoutData['supabase'];
+	export let document: number;
 
 	let element: any;
 	let editor: any;
@@ -23,7 +21,7 @@
 		const yDoc = new Y.Doc();
 		const provider = new SupabaseProvider(yDoc, supabase, {
 			channel: 1 as unknown as string,
-			id: documentId,
+			id: document.id,
 			tableName: 'documents',
 			columnName: 'document'
 		});
