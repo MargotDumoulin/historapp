@@ -3,18 +3,29 @@
 	import type { LayoutData } from '../../$types';
 	import { page } from '$app/stores';
 	import { ProgressBar } from '@skeletonlabs/skeleton';
+	import { Roles } from '$lib/types/general.types';
 
 	export let data: LayoutData;
 	// TODO: Type !!
 	let document: any;
+	let child: any;
 
 	const loadData = async (id: number) => {
+		const {
+			data: { user }
+		} = await data?.supabase.auth.getUser(); // TODO: remove when user is correctly put in store :)
+
 		const { data: dataFromDoc, error } = await data?.supabase
-			?.from('documents')
+			?.from('document_and_role')
 			.select()
-			.eq('id', id)
+			.match({ id, id_user: user?.id })
 			.maybeSingle();
+
 		document = dataFromDoc;
+	};
+
+	const updateDocumentTitle = (event) => {
+		child.save(event.target.value); // TODO: type for fuck sake
 	};
 
 	page.subscribe(({ params }) => {
@@ -32,33 +43,36 @@
 					class="bg-transparent ml-2 mt-5 focus:outline-none text-xl font-bold"
 					id={document.id}
 					type="string"
+					disabled={document.role_name !== Roles.OWNER}
+					on:input={updateDocumentTitle}
 					bind:value={document.name}
 				/>
-			{/if}
-			<button
-				class="m-2 btn-sm variant-soft hover:bg-grey text-grey-darkest font-bold py-2 px-4 rounded-full inline-flex items-center"
-			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke-width="1.5"
-					stroke="currentColor"
-					class="w-6 h-6 mr-1"
+				<button
+					class="m-2 btn-sm variant-soft hover:bg-grey text-grey-darkest font-bold py-2 px-4 rounded-full inline-flex items-center"
+					disabled={!document.edit}
 				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M12 9.75v6.75m0 0l-3-3m3 3l3-3m-8.25 6a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"
-					/>
-				</svg>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke-width="1.5"
+						stroke="currentColor"
+						class="w-6 h-6 mr-1"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M12 9.75v6.75m0 0l-3-3m3 3l3-3m-8.25 6a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"
+						/>
+					</svg>
 
-				<span>Save</span>
-			</button>
+					<span>Save</span>
+				</button>
+			{/if}
 		</div>
 		<div class="sheet-container p-5 card shadow-md">
 			{#if document?.id}
-				<Tiptap supabase={data.supabase} {document} />
+				<Tiptap bind:this={child} supabase={data.supabase} bind:document />
 			{:else}
 				<ProgressBar />
 			{/if}

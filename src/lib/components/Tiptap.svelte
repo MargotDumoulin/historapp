@@ -10,16 +10,24 @@
 	import type { LayoutData } from '../../routes/$types';
 
 	export let supabase: LayoutData['supabase'];
-	export let document: number;
+	export let document: any;
 
+	// TODO: tyyyyyyyyyyyyype !!!!!!!!!
 	let element: any;
 	let editor: any;
+	let yDoc: any;
+	let provider: any;
+
+	export const save = (value: string) => {
+		provider.save(value);
+	};
 
 	onMount(() => {
 		const randomColor = Math.floor(Math.random() * 16777215).toString(16);
 
-		const yDoc = new Y.Doc();
-		const provider = new SupabaseProvider(yDoc, supabase, {
+		yDoc = new Y.Doc();
+
+		provider = new SupabaseProvider(yDoc, supabase, {
 			channel: 1 as unknown as string,
 			id: document.id,
 			tableName: 'documents',
@@ -46,7 +54,8 @@
 			onTransaction: () => {
 				// force re-render so `editor.isActive` works as expected
 				editor = editor;
-			}
+			},
+			editable: document.edit
 		});
 	});
 
@@ -58,10 +67,12 @@
 </script>
 
 {#if editor}
+	<!-- TODO: Make it generic :p -->
 	<button
 		on:click={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
 		class:active={editor.isActive('heading', { level: 1 })}
 		class="btn btn-sm variant-soft-secondary"
+		disabled={!document.edit}
 	>
 		H1
 	</button>
@@ -69,6 +80,7 @@
 		on:click={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
 		class:active={editor.isActive('heading', { level: 2 })}
 		class="btn btn-sm variant-soft-secondary"
+		disabled={!document.edit}
 	>
 		H2
 	</button>
@@ -76,6 +88,7 @@
 		on:click={() => editor.chain().focus().setParagraph().run()}
 		class:active={editor.isActive('paragraph')}
 		class="btn btn-sm variant-soft-secondary"
+		disabled={!document.edit}
 	>
 		P
 	</button>

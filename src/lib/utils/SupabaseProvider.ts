@@ -53,12 +53,12 @@ export default class SupabaseProvider extends EventEmitter {
 		awarenessProtocol.removeAwarenessStates(this.awareness, [doc.clientID], 'window unload');
 	}
 
-	async save() {
+	async save(name?: string) {
 		const content = Array.from(Y.encodeStateAsUpdateV2(this.doc));
 
 		const { error } = await this.supabase
 			.from(this.config.tableName)
-			.update({ [this.config.columnName]: content })
+			.update({ [this.config.columnName]: content, ...(name && { name }) })
 			.eq(this.config.idName || 'id', this.config.id);
 
 		if (error) {
