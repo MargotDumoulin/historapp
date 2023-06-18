@@ -17,7 +17,14 @@
 	let sourceData: any;
 
 	const fetchDocuments = async () => {
-		const { data, error } = await supabase.from('documents').select();
+		const {
+			data: { user }
+		} = await supabase.auth.getUser(); // TODO: remove when user is correctly put in store :)
+
+		const { data, error } = await supabase
+			.from('authorized_documents')
+			.select()
+			.match({ id_user: user?.id });
 		if (!error) {
 			sourceData = data;
 		}
