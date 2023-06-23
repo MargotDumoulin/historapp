@@ -183,7 +183,7 @@ export default class SupabaseProvider extends EventEmitter {
 						event: 'message',
 						payload: Array.from(Y.encodeStateAsUpdateV2(this.doc))
 					});
-			}, this.config.resyncInterval || 5000);
+			}, this.config.resyncInterval || 500);
 		}
 
 		if (typeof window !== 'undefined') {
