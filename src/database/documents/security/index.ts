@@ -7,6 +7,6 @@ export const insertDocumentSecurityRow = async (
 ) =>
 	await supabase
 		.from('documents_security')
-		.insert({ id_user: userId, id_document: documentId, id_role: 2 }) // TODO: Do not harcode the role's id.
+		.insert({ id_user: userId, id_document: documentId, id_role: 1 }) // TODO: Do not harcode the role's id.
 		.select()
 		.maybeSingle();
