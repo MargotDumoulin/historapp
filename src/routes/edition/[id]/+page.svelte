@@ -4,18 +4,19 @@
 	import { page } from '$app/stores';
 	import { ProgressBar } from '@skeletonlabs/skeleton';
 	import { Roles } from '$lib/types/general.types';
+	import type { Database } from '$lib/types/database.types';
 
 	export let data: LayoutData;
-	// TODO: Type !!
-	let document: any;
-	let child: any;
+
+	let document: Database['public']['Views']['document_and_role']['Row'] | null;
+	let child: Tiptap;
 
 	const loadData = async (id: number) => {
 		const {
 			data: { user }
 		} = await data?.supabase.auth.getUser(); // TODO: remove when user is correctly put in store :)
 
-		const { data: dataFromDoc, error } = await data?.supabase
+		const { data: dataFromDoc } = await data?.supabase
 			?.from('document_and_role')
 			.select()
 			.match({ id, id_user: user?.id })
@@ -24,8 +25,8 @@
 		document = dataFromDoc;
 	};
 
-	const updateDocumentTitle = (event) => {
-		child.save(event.target.value); // TODO: type for fuck sake
+	const updateDocumentTitle = (event: Event) => {
+		child.save((event?.target as HTMLInputElement)?.value);
 	};
 
 	page.subscribe(({ params }) => {
@@ -41,7 +42,7 @@
 			{:else}
 				<input
 					class="bg-transparent ml-2 mt-5 focus:outline-none text-xl font-bold"
-					id={document.id}
+					id={String(document.id)}
 					type="string"
 					disabled={document.role_name !== Roles.OWNER}
 					on:input={updateDocumentTitle}

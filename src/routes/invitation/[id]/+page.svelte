@@ -2,10 +2,11 @@
 	import type { LayoutData } from '../../$types';
 	import { page } from '$app/stores';
 	import { ProgressRadial } from '@skeletonlabs/skeleton';
+	import type { Database } from '$lib/types/database.types';
 
 	export let data: LayoutData;
 
-	let invitation: any; // TODO: type !!!
+	let invitation: Database['public']['Tables']['documents_invitations']['Row'] | null;
 	let loading: boolean = true;
 
 	const acceptInvitationInDb = async (id: string) => {

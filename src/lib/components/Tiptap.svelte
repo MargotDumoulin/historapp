@@ -3,33 +3,29 @@
 	import { Editor } from '@tiptap/core';
 	import StarterKit from '@tiptap/starter-kit';
 	import Collaboration from '@tiptap/extension-collaboration';
-	import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
-	import { userLoggedIn } from '../../store';
 	import * as Y from 'yjs';
 	import SupabaseProvider from '$lib/utils/SupabaseProvider';
 	import type { LayoutData } from '../../routes/$types';
+	import type { Database } from '$lib/types/database.types';
 
 	export let supabase: LayoutData['supabase'];
-	export let document: any;
+	export let document: Database['public']['Views']['document_and_role']['Row'];
 
-	// TODO: tyyyyyyyyyyyyype !!!!!!!!!
-	let element: any;
-	let editor: any;
-	let yDoc: any;
-	let provider: any;
+	let element: Element;
+	let editor: Editor;
+	let yDoc: Y.Doc;
+	let provider: SupabaseProvider;
 
 	export const save = (value: string) => {
 		provider.save(value);
 	};
 
 	onMount(() => {
-		const randomColor = Math.floor(Math.random() * 16777215).toString(16);
-
 		yDoc = new Y.Doc();
 
 		provider = new SupabaseProvider(yDoc, supabase, {
 			channel: 1 as unknown as string,
-			id: document.id,
+			id: document.id as number,
 			tableName: 'documents',
 			columnName: 'document'
 		});
@@ -43,19 +39,12 @@
 				Collaboration.configure({
 					document: provider.doc
 				})
-				// CollaborationCursor.configure({
-				// 	provider: provider,
-				// 	user: {
-				// 		name: `${$userLoggedIn?.first_name} ${$userLoggedIn?.last_name}`,
-				// 		color: `#${randomColor}`
-				// 	}
-				// })
 			],
 			onTransaction: () => {
 				// force re-render so `editor.isActive` works as expected
 				editor = editor;
 			},
-			editable: document.edit
+			editable: !!document.edit
 		});
 	});
 

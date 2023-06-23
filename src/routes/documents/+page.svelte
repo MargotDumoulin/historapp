@@ -14,12 +14,12 @@
 	import { Modals, closeModal } from 'svelte-modals';
 	import { openModal } from 'svelte-modals';
 	import ShareDocumentForm from '$lib/components/ShareDocumentForm.svelte';
+	import type { Database } from '$lib/types/database.types';
 
 	export let data: LayoutData;
 	$: ({ supabase, session } = data);
 
-	// TODO: type !!
-	let sourceData: any;
+	let sourceData: Database['public']['Views']['authorized_documents']['Row'][];
 
 	const fetchDocuments = async () => {
 		const {
@@ -31,6 +31,7 @@
 			.select()
 			.match({ id_user: user?.id });
 		if (!error) {
+			console.log({ data });
 			sourceData = data;
 		}
 	};
@@ -93,17 +94,15 @@
 			{#if sourceData?.length > 0}
 				<table>
 					<tbody>
-						{#each sourceData as document, i (document.id)}
+						{#each sourceData as doc, i (doc.id)}
 							<tr>
 								<td>
 									<div class="row-container">
-										<div>{document.name}</div>
+										<div>{doc.name}</div>
 										<div>
 											<button
 												class="btn-sm variant-soft bg-tertiary-50 text-tertiary-500 font-bold py-2 px-4 rounded-full inline-flex items-center"
-												on:click={() => {
-													openShareDocumentModal(document.id);
-												}}
+												on:click={() => openShareDocumentModal(Number(doc.id))}
 											>
 												<svg
 													xmlns="http://www.w3.org/2000/svg"
@@ -117,7 +116,7 @@
 											</button>
 											<button
 												class="m-2 btn-sm variant-soft bg-primary-50 text-primary-500 font-bold py-2 px-4 rounded-full inline-flex items-center"
-												on:click={() => goToEdit(document.id)}
+												on:click={() => goToEdit(Number(doc.id))}
 											>
 												<svg
 													xmlns="http://www.w3.org/2000/svg"

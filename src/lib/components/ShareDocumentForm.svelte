@@ -3,28 +3,29 @@
 	import AutoComplete from 'simple-svelte-autocomplete';
 	import type { LayoutData } from '../../routes/$types';
 	import { onMount } from 'svelte';
+	import type { Database } from '$lib/types/database.types';
 
 	export let isOpen: boolean;
-	export let supabase: LayoutData['supabase']; // TODO: type
+	export let supabase: LayoutData['supabase'];
 	export let documentId: number;
 
-	let selectedUser: any; // TODO: type !!!
-	let selectedRole: any;
+	let selectedUser: Database['public']['Tables']['users']['Row'];
+	let selectedRole: Database['public']['Tables']['documents_roles']['Row'];
 
 	const getUsers = async (text: string) => {
-		const { data, error } = await supabase.from('auth_users').select().match({ email: text });
+		const { data } = await supabase.from('auth_users').select().match({ email: text });
 		return data || [];
 	};
 
 	const getRoles = async (text: string) => {
-		const { data, error } = await supabase.from('documents_roles').select();
+		const { data } = await supabase.from('documents_roles').select();
 		return data || [];
 	};
 
 	const sendForm = async () => {
 		if (!selectedRole || !selectedUser) return;
 
-		const { error } = await supabase
+		await supabase
 			.from('documents_invitations')
 			.insert({ id_user: selectedUser.id, id_role: selectedRole.id, id_document: documentId });
 
