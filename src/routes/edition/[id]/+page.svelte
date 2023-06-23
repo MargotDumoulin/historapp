@@ -5,6 +5,8 @@
 	import { ProgressBar } from '@skeletonlabs/skeleton';
 	import { Roles } from '$lib/types/general.types';
 	import type { Database } from '$lib/types/database.types';
+	import { fetchUserFromSession } from '../../../database/users/auth';
+	import { fetchDocumentAndRole } from '../../../database/documents';
 
 	export let data: LayoutData;
 
@@ -12,15 +14,15 @@
 	let child: Tiptap;
 
 	const loadData = async (id: number) => {
+		if (!data?.supabase) return;
+
 		const {
 			data: { user }
-		} = await data?.supabase.auth.getUser(); // TODO: remove when user is correctly put in store :)
+		} = await fetchUserFromSession(data.supabase);
 
-		const { data: dataFromDoc } = await data?.supabase
-			?.from('document_and_role')
-			.select()
-			.match({ id, id_user: user?.id })
-			.maybeSingle();
+		if (!user?.id) return;
+
+		const { data: dataFromDoc } = await fetchDocumentAndRole(data.supabase, id, user.id);
 
 		document = dataFromDoc;
 	};

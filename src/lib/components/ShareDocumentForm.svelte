@@ -4,6 +4,9 @@
 	import type { LayoutData } from '../../routes/$types';
 	import { onMount } from 'svelte';
 	import type { Database } from '$lib/types/database.types';
+	import { insertInvitationInDb } from '../../database/documents/invitations';
+	import { fetchRoles } from '../../database/documents/roles';
+	import { fetchUsersByExactEmail } from '../../database/users/auth';
 
 	export let isOpen: boolean;
 	export let supabase: LayoutData['supabase'];
@@ -13,22 +16,18 @@
 	let selectedRole: Database['public']['Tables']['documents_roles']['Row'];
 
 	const getUsers = async (text: string) => {
-		const { data } = await supabase.from('auth_users').select().match({ email: text });
+		const { data } = await fetchUsersByExactEmail(supabase, text);
 		return data || [];
 	};
 
-	const getRoles = async (text: string) => {
-		const { data } = await supabase.from('documents_roles').select();
+	const getRoles = async (_text: string) => {
+		const { data } = await fetchRoles(supabase);
 		return data || [];
 	};
 
 	const sendForm = async () => {
 		if (!selectedRole || !selectedUser) return;
-
-		await supabase
-			.from('documents_invitations')
-			.insert({ id_user: selectedUser.id, id_role: selectedRole.id, id_document: documentId });
-
+		await insertInvitationInDb(supabase, selectedUser.id, selectedRole.id, documentId);
 		closeModal();
 	};
 

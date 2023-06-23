@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import FormInput from '$lib/components/FormInput.svelte';
-	import type { FieldRules, FieldType } from '$lib/types/general.types';
+	import type { FieldType } from '$lib/types/general.types';
 	import { rules } from '$lib/utils/rules';
 	import { validateFields } from '$lib/utils/validate';
 	import type { LayoutData } from '../$types';
-	import { userLoggedIn } from '../../store';
 
 	export let data: LayoutData;
 	$: ({ supabase } = data);
@@ -29,29 +28,8 @@
 			password
 		});
 
-		if (!error) {
-			const {
-				data: { user }
-			} = await supabase.auth.getUser();
-
-			const { data: userComplete, error: userError } = await supabase
-				.from('users')
-				.select()
-				.eq('uuid_auth_user', user?.id);
-
-			if (userComplete?.[0] && !userError) {
-				// TODO: QUAND LE USER ARRIVE SUR L'APP ET EST DEJA AUTHENTIFIE, METTRE LE USER DANS LE STORE !!!
-				// CETTE FACON DE FAIRE EST PAS VIABLE
-				userLoggedIn.set({
-					uuid_auth_user: userComplete[0].uuid_auth_user,
-					last_name: userComplete[0].last_name,
-					first_name: userComplete[0].first_name,
-					id: userComplete[0].id
-				});
-			}
-
-			goto('/');
-		} else wrongCredentialsError = 'Wrong credentials';
+		if (!error) goto('/');
+		else wrongCredentialsError = 'Wrong credentials';
 	};
 </script>
 

@@ -1,39 +1,30 @@
 <script lang="ts">
-	import Tiptap from '$lib/components/Tiptap.svelte';
-	import {
-		Modal,
-		ProgressRadial,
-		Table,
-		tableMapperValues,
-		type TableSource
-	} from '@skeletonlabs/skeleton';
+	import { ProgressRadial } from '@skeletonlabs/skeleton';
 	import type { LayoutData } from '../$types';
 	import { onMount } from 'svelte';
-	import { modalStore } from '@skeletonlabs/skeleton';
 	import { goto } from '$app/navigation';
-	import { Modals, closeModal } from 'svelte-modals';
 	import { openModal } from 'svelte-modals';
 	import ShareDocumentForm from '$lib/components/ShareDocumentForm.svelte';
 	import type { Database } from '$lib/types/database.types';
+	import type { User } from '@supabase/supabase-js';
+	import { fetchUserFromSession } from '../../database/users/auth';
+	import { fetchAuthorizedDocuments, insertDocument } from '../../database/documents';
+	import { insertDocumentSecurityRow } from '../../database/documents/security';
 
 	export let data: LayoutData;
-	$: ({ supabase, session } = data);
+	$: ({ supabase } = data);
 
 	let sourceData: Database['public']['Views']['authorized_documents']['Row'][];
+	let user: User | null;
+
+	const fetchUser = async () => {
+		user = (await fetchUserFromSession(supabase)).data.user;
+	};
 
 	const fetchDocuments = async () => {
-		const {
-			data: { user }
-		} = await supabase.auth.getUser(); // TODO: remove when user is correctly put in store :)
-
-		const { data, error } = await supabase
-			.from('authorized_documents')
-			.select()
-			.match({ id_user: user?.id });
-		if (!error) {
-			console.log({ data });
-			sourceData = data;
-		}
+		if (!user?.id) return;
+		const { data, error } = await fetchAuthorizedDocuments(supabase, user.id);
+		if (!error) sourceData = data;
 	};
 
 	const goToEdit = (id: number) => {
@@ -41,22 +32,12 @@
 	};
 
 	const createDocument = async () => {
-		if (!session) return;
+		if (!user?.id) return;
 
-		const { data: createdDocumentData, error } = await supabase
-			.from('documents')
-			.insert({ id_owner: session.user.id })
-			.select()
-			.maybeSingle();
+		const { data: createdDocumentData } = await insertDocument(supabase, user.id);
 
 		if (createdDocumentData) {
-			// TODO: Do not harcode the role's id.
-			await supabase
-				.from('documents_security')
-				.insert({ id_user: session.user.id, id_document: createdDocumentData.id, id_role: 2 })
-				.select()
-				.maybeSingle();
-
+			await insertDocumentSecurityRow(supabase, user.id, createdDocumentData.id);
 			goto(`/edition/${createdDocumentData.id}`);
 		}
 	};
@@ -68,7 +49,9 @@
 	let loading = true;
 
 	onMount(async () => {
+		await fetchUser();
 		await fetchDocuments();
+
 		loading = false;
 	});
 </script>

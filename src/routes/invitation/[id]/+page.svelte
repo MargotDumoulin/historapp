@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import { ProgressRadial } from '@skeletonlabs/skeleton';
 	import type { Database } from '$lib/types/database.types';
+	import { updateInvitationAcceptedInDb } from '../../../database/documents/invitations';
 
 	export let data: LayoutData;
 
@@ -10,17 +11,9 @@
 	let loading: boolean = true;
 
 	const acceptInvitationInDb = async (id: string) => {
-		const { data: invData, error } = await data?.supabase
-			.from('documents_invitations')
-			.update({ accepted: true })
-			.eq('id', id)
-			.select()
-			.maybeSingle();
-
-		if (!error) {
-			invitation = invData;
-		}
-
+		if (!data?.supabase) return;
+		const { data: invData, error } = await updateInvitationAcceptedInDb(data.supabase, true, id);
+		if (!error) invitation = invData;
 		loading = false;
 	};
 
