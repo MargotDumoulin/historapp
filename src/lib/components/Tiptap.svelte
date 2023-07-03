@@ -24,7 +24,7 @@
 		yDoc = new Y.Doc();
 
 		provider = new SupabaseProvider(yDoc, supabase, {
-			channel: 1 as unknown as string,
+			channel: String(document.id),
 			id: document.id as number,
 			tableName: 'documents',
 			columnName: 'document'
@@ -50,6 +50,7 @@
 
 	onDestroy(() => {
 		if (editor) {
+			provider.destroy();
 			editor.destroy();
 		}
 	});
