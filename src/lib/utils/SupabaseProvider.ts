@@ -38,7 +38,7 @@ export default class SupabaseProvider extends EventEmitter {
 	onDocumentUpdate(update: Uint8Array, origin: any) {
 		if (origin !== this) {
 			this.logger('Document updated locally, broadcasting update to peers', this.isOnline());
-			this.emit('message', update);
+			this.emit('message', Y.encodeStateAsUpdateV2(this.doc)); // TODO: trouver un moyen de juste utiliser le param update
 			this.save();
 		}
 	}
@@ -174,16 +174,16 @@ export default class SupabaseProvider extends EventEmitter {
 			this.logger(
 				`Setting resync interval to every ${(this.config.resyncInterval || 5000) / 1000} seconds`
 			);
-			this.resyncInterval = setInterval(() => {
-				this.logger('Resyncing (resync interval elapsed)');
-				this.emit('message', Y.encodeStateAsUpdateV2(this.doc));
-				if (this.channel)
-					this.channel.send({
-						type: 'broadcast',
-						event: 'message',
-						payload: Array.from(Y.encodeStateAsUpdateV2(this.doc))
-					});
-			}, this.config.resyncInterval || 500);
+			// this.resyncInterval = setInterval(() => {
+			// 	this.logger('Resyncing (resync interval elapsed)');
+			// 	this.emit('message', Y.encodeStateAsUpdateV2(this.doc));
+			// 	if (this.channel)
+			// 		this.channel.send({
+			// 			type: 'broadcast',
+			// 			event: 'message',
+			// 			payload: Array.from(Y.encodeStateAsUpdateV2(this.doc))
+			// 		});
+			// }, this.config.resyncInterval || 5000);
 		}
 
 		if (typeof window !== 'undefined') {
